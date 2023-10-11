@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() ,GestureDetector.OnGestureListener,Sens
     var xOld:Float = 0.0f
     var yOld:Float = 0.0f
     var zOld:Float = 0.0f
-    var threshold:Float = 3000.0f
+    var threshold:Float = 1000.0f
     var oldTime:Long = 0
     private lateinit var imageViewed: ImageView
     companion object{
@@ -232,7 +232,7 @@ class MainActivity : AppCompatActivity() ,GestureDetector.OnGestureListener,Sens
                 }
 
 
-            }
+            }.start()
 
     }
 
