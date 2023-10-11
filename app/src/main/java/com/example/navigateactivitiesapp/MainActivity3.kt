@@ -1,19 +1,31 @@
 package com.example.navigateactivitiesapp
 
 import android.content.Intent
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.GestureDetector
 import android.view.MotionEvent
+import android.widget.ImageView
 import android.widget.Toast
 import java.lang.Math.abs
 
-class MainActivity3 : AppCompatActivity() ,GestureDetector.OnGestureListener{
+class MainActivity3 : AppCompatActivity() ,GestureDetector.OnGestureListener,SensorEventListener{
     private lateinit var gestureDetector: GestureDetector
     var x1:Float = 0.0f
     var x2:Float = 0.0f
     var y1:Float = 0.0f
     var y2:Float = 0.0f
+
+    var xOld:Float = 0.0f
+    var yOld:Float = 0.0f
+    var zOld:Float = 0.0f
+    var threshold:Float = 3000.0f
+    var oldTime:Long = 0
+
+    private lateinit var imageViewed: ImageView
 
     companion object{
         const val MIN_DISTANCE = 150
@@ -22,6 +34,8 @@ class MainActivity3 : AppCompatActivity() ,GestureDetector.OnGestureListener{
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main3)
         gestureDetector = GestureDetector(this,this)
+
+        imageViewed =findViewById<ImageView>(R.id.imageView2)
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -94,6 +108,67 @@ class MainActivity3 : AppCompatActivity() ,GestureDetector.OnGestureListener{
         velocityY: Float
     ): Boolean {
         return false
+//        TODO("Not yet implemented")
+    }
+
+    override fun onSensorChanged(event: SensorEvent?) {
+//        TODO("Not yet implemented")
+        var currentX = event!!.values[0]
+        var currentY = event!!.values[1]
+        var currentZ = event!!.values[2]
+        var currentTime = System.currentTimeMillis()
+        if((currentTime - oldTime) > 100 ){
+            var timeDifference = currentTime - oldTime
+            oldTime = currentTime
+            var speed = Math.abs(currentX+currentY+currentZ - xOld - yOld - zOld)/timeDifference*10000
+            if(speed > threshold){
+                shakeImage()
+                Toast.makeText(this,"Start Rotating",Toast.LENGTH_LONG)
+            }
+        }
+    }
+
+    private fun shakeImage(){
+
+        imageViewed.animate().apply {
+            duration  = 250
+            rotationBy(-20f)
+        }.withEndAction{
+            imageViewed.animate().apply {
+                duration  = 250
+                rotationBy(40f)}
+        }.withEndAction{
+            imageViewed.animate().apply {
+                duration  = 250
+                rotationBy(-40f)}
+        }.withEndAction{
+            imageViewed.animate().apply {
+                duration  = 250
+                rotationBy(40f)
+            }.withEndAction{
+                imageViewed.animate().apply {
+                    duration  = 250
+                    rotationBy(-40f)
+                }}.withEndAction{
+                imageViewed.animate().apply {
+                    duration  = 250
+                    rotationBy(40f)}
+            }.withEndAction{
+                imageViewed.animate().apply {
+                    duration  = 250
+                    rotationBy(-40f)
+                }
+            }.withEndAction{
+                imageViewed.animate().apply {
+                    duration  = 250
+                    rotationBy(-20f)}
+            }
+
+
+        }
+
+    }
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
 //        TODO("Not yet implemented")
     }
 }

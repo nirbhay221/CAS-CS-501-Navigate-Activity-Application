@@ -1,20 +1,36 @@
 package com.example.navigateactivitiesapp
 
+import android.content.Context
 import android.content.Intent
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.GestureDetector
 import android.view.MotionEvent
+import android.view.animation.Animation
+import android.view.animation.TranslateAnimation
+import android.widget.ImageView
 import android.widget.Toast
 import java.lang.Math.abs
 
-class MainActivity : AppCompatActivity() ,GestureDetector.OnGestureListener{
+class MainActivity : AppCompatActivity() ,GestureDetector.OnGestureListener,SensorEventListener {
     private lateinit var gestureDetector: GestureDetector
+    private var sensor:Sensor ?= null
+    private var sensorManager: SensorManager ?=null
     var x1:Float = 0.0f
     var x2:Float = 0.0f
     var y1:Float = 0.0f
     var y2:Float = 0.0f
 
+    var xOld:Float = 0.0f
+    var yOld:Float = 0.0f
+    var zOld:Float = 0.0f
+    var threshold:Float = 3000.0f
+    var oldTime:Long = 0
+    private lateinit var imageViewed: ImageView
     companion object{
         const val MIN_DISTANCE = 150
     }
@@ -24,8 +40,11 @@ class MainActivity : AppCompatActivity() ,GestureDetector.OnGestureListener{
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         gestureDetector = GestureDetector(this,this)
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        sensor = sensorManager!!.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
 
-//        moveToBottomScreen()
+        imageViewed =findViewById<ImageView>(R.id.imageView3)
+
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -81,6 +100,15 @@ class MainActivity : AppCompatActivity() ,GestureDetector.OnGestureListener{
         return false
     }
 
+    override fun onResume(){
+        super.onResume()
+        sensorManager!!.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL)
+    }
+    override fun onPause() {
+        super.onPause()
+        sensorManager!!.unregisterListener(this)
+    }
+
     override fun onScroll(
         e1: MotionEvent,
         e2: MotionEvent,
@@ -129,5 +157,65 @@ class MainActivity : AppCompatActivity() ,GestureDetector.OnGestureListener{
         startActivity(intent)
         finish()
         Toast.makeText(this,"You are on the Right Activity",Toast.LENGTH_LONG)
+    }
+
+    override fun onSensorChanged(event: SensorEvent?) {
+//        TODO("Not yet implemented")
+        var currentX = event!!.values[0]
+        var currentY = event!!.values[1]
+        var currentZ = event!!.values[2]
+        var currentTime = System.currentTimeMillis()
+        if((currentTime - oldTime) > 100 ){
+            var timeDifference = currentTime - oldTime
+            oldTime = currentTime
+            var speed = Math.abs(currentX+currentY+currentZ - xOld - yOld - zOld)/timeDifference*10000
+            if(speed > threshold){
+                shakeImage()
+                Toast.makeText(this,"Start Rotating",Toast.LENGTH_LONG)
+            }
+        }
+    }
+    private fun shakeImage(){
+
+            imageViewed.animate().apply {
+                duration  = 250
+                rotationBy(-20f)
+            }.withEndAction{
+                imageViewed.animate().apply {
+                    duration  = 250
+                    rotationBy(40f)}
+            }.withEndAction{
+                imageViewed.animate().apply {
+                    duration  = 250
+                    rotationBy(-40f)}
+            }.withEndAction{
+                imageViewed.animate().apply {
+                    duration  = 250
+                    rotationBy(40f)
+                }.withEndAction{
+                    imageViewed.animate().apply {
+                        duration  = 250
+                        rotationBy(-40f)
+                    }}.withEndAction{
+                    imageViewed.animate().apply {
+                        duration  = 250
+                        rotationBy(40f)}
+                }.withEndAction{
+                    imageViewed.animate().apply {
+                        duration  = 250
+                        rotationBy(-40f)
+                    }
+                }.withEndAction{
+                    imageViewed.animate().apply {
+                        duration  = 250
+                        rotationBy(-20f)}
+                }
+
+
+            }
+
+    }
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+//        TODO("Not yet implemented")
     }
 }

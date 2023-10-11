@@ -18,4 +18,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="182dp"
+        android:layout_height="282dp"
+        android:layout_marginTop="350dp"
+        android:layout_marginLeft="120dp"
+        app:srcCompat="@drawable/oip__3_"
+        tools:layout_editor_absoluteX="129dp"
+        tools:layout_editor_absoluteY="400dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textView"
+        app:layout_constraintTop_toTopOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
