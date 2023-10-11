@@ -1,6 +1,7 @@
 package com.example.navigateactivitiesapp
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -31,13 +32,32 @@ class MainActivity2 : AppCompatActivity() ,GestureDetector.OnGestureListener,Sen
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main2)
+
+        val orientation = resources.configuration.orientation
+
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setContentView(R.layout.activity_main2_landscape)
+        } else {
+            setContentView(R.layout.activity_main2)
+        }
         gestureDetector = GestureDetector(this,this)
 
         imageViewed =findViewById<ImageView>(R.id.imageView)
 
+
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setContentView(R.layout.activity_main2_landscape)
+
+            Toast.makeText(this,"changed to landscape",Toast.LENGTH_LONG)
+        } else {
+            setContentView(R.layout.activity_main2)
+            Toast.makeText(this,"changed to portrait",Toast.LENGTH_LONG)
+        }}
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         if (event != null) {
             gestureDetector.onTouchEvent(event)

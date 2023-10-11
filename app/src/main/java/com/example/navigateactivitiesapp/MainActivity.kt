@@ -2,6 +2,7 @@ package com.example.navigateactivitiesapp
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -38,15 +39,34 @@ class MainActivity : AppCompatActivity() ,GestureDetector.OnGestureListener,Sens
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+
+        val orientation = resources.configuration.orientation
+
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setContentView(R.layout.activity_main_landscape)
+        } else {
+            setContentView(R.layout.activity_main)
+        }
         gestureDetector = GestureDetector(this,this)
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         sensor = sensorManager!!.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
 
         imageViewed =findViewById<ImageView>(R.id.imageView3)
 
+
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setContentView(R.layout.activity_main_landscape)
+
+            Toast.makeText(this,"changed to landscape",Toast.LENGTH_LONG)
+        } else {
+            setContentView(R.layout.activity_main)
+            Toast.makeText(this,"changed to portrait",Toast.LENGTH_LONG)
+        }}
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         if (event != null) {
             gestureDetector.onTouchEvent(event)
@@ -215,6 +235,7 @@ class MainActivity : AppCompatActivity() ,GestureDetector.OnGestureListener,Sens
             }
 
     }
+
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
 //        TODO("Not yet implemented")
     }
